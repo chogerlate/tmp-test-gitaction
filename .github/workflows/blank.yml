@@ -1,0 +1,30 @@
+name: CI and Optional CD
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_deploy:
+        description: 'Check this box to run the deployment step'
+        type: boolean
+        required: true
+        default: false
+
+jobs:
+  # Job 1: Always runs automatically when you trigger the workflow
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Tests
+        run: echo "Running your continuous integration tests..."
+
+  # Job 2: Only runs if you checked the manual box
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build_and_test # Ensures deployment happens AFTER tests pass
+    if: ${{ inputs.run_deploy == true }} # The manual click check
+    steps:
+      - name: Deploy Step
+        run: echo "Deploying your application manually!"
